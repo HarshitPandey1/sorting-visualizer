@@ -1,0 +1,15 @@
+.array-container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;  /* Center align bars */
+    height: 500px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 10px;
+  }
+  
+  .array-bar {
+    margin: 0 2px;
+    transition: height 0.3s ease, width 0.3s ease; /* Smooth height and width transition */
+  }
+  
