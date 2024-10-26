@@ -92,3 +92,16 @@ button:disabled {
   background-color: #b0b0b0;
   cursor: not-allowed;
 }
+.custom-array-input {
+  margin-top: 20px;
+}
+
+.custom-array-input input {
+  padding: 8px;
+  width: 200px;
+  margin-right: 10px;
+}
+
+.custom-array-input button {
+  padding: 8px 12px;
+}

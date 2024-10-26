@@ -13,8 +13,9 @@ function App() {
   const [array, setArray] = useState([]);
   const [isSorting, setIsSorting] = useState(false);
   const [arraySize, setArraySize] = useState(50);
+  const [customArray, setCustomArray] = useState(""); // New state for user input array
   const [selectedAlgorithm, setSelectedAlgorithm] = useState('');
-  const [comparisonResults, setComparisonResults] = useState([]); // To store comparison results
+  const [comparisonResults, setComparisonResults] = useState([]);
 
   useEffect(() => {
     resetArray();
@@ -25,6 +26,26 @@ function App() {
     if (isSorting) return;
     const newArray = Array.from({ length: arraySize }, () => Math.floor(Math.random() * 500) + 1);
     setArray(newArray);
+    setCustomArray(""); // Clear custom array input
+  }
+
+  // Update array based on custom input
+  function handleCustomArrayInput(event) {
+    setCustomArray(event.target.value);
+  }
+
+  // Parse and set custom array
+  function setCustomArrayAsArray() {
+    const parsedArray = customArray
+      .split(",")
+      .map((num) => parseInt(num.trim()))
+      .filter((num) => !isNaN(num)); // Parse input and filter invalid numbers
+    if (parsedArray.length) {
+      setArray(parsedArray);
+      setArraySize(parsedArray.length); // Adjust slider to match custom array size
+    } else {
+      alert("Please enter a valid array of numbers, separated by commas.");
+    }
   }
 
   // Handle sorting based on selected algorithm
@@ -80,7 +101,6 @@ function App() {
       }, index * 50);
     });
 
-    // Reset bars to default color after sorting
     setTimeout(() => {
       const arrayBars = document.getElementsByClassName('array-bar');
       for (let i = 0; i < arrayBars.length; i++) {
@@ -88,35 +108,6 @@ function App() {
       }
       setIsSorting(false);
     }, animations.length * 50);
-  }
-
-  // Function to compare algorithms based on execution time
-  function compareAlgorithms() {
-    const algorithms = [
-      { name: 'Bubble Sort', func: bubbleSort },
-      { name: 'Quick Sort', func: quickSort },
-      { name: 'Merge Sort', func: mergeSort },
-      { name: 'Heap Sort', func: heapSort },
-      { name: 'Insertion Sort', func: insertionSort },
-    ];
-
-    const results = [];
-    const arrayCopy = array.slice();
-
-    algorithms.forEach(({ name, func }) => {
-      const start = performance.now();
-      func(arrayCopy.slice()); // Sort a copy of the array
-      const end = performance.now();
-      const timeTaken = (end - start).toFixed(2); // Calculate time taken in milliseconds
-      results.push({ name, timeTaken });
-    });
-
-    setComparisonResults(results);
-  }
-
-  // Update array size based on slider
-  function handleArraySizeChange(event) {
-    setArraySize(event.target.value);
   }
 
   return (
@@ -131,41 +122,25 @@ function App() {
           min="5"
           max="100"
           value={arraySize}
-          onChange={handleArraySizeChange}
+          onChange={(e) => setArraySize(e.target.value)}
           disabled={isSorting}
           className="slider"
         />
       </label>
 
-      <button onClick={compareAlgorithms} disabled={isSorting} className="compare-button">
-        Compare Algorithms
-      </button>
+      <div className="custom-array-input">
+        <input
+          type="text"
+          value={customArray}
+          onChange={handleCustomArrayInput}
+          placeholder="Enter numbers separated by commas"
+          disabled={isSorting}
+        />
+        <button onClick={setCustomArrayAsArray} disabled={isSorting}>Use Custom Array</button>
+      </div>
 
-      {/* Display comparison results */}
-      {comparisonResults.length > 0 && (
-        <div className="comparison-results">
-          <h2>Algorithm Execution Time (ms)</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Algorithm</th>
-                <th>Execution Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {comparisonResults.map(({ name, timeTaken }) => (
-                <tr key={name}>
-                  <td>{name}</td>
-                  <td>{timeTaken} ms</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      <TimeComplexityWindow algorithm={selectedAlgorithm} />
       <Visualization array={array} arraySize={arraySize} />
+      <TimeComplexityWindow algorithm={selectedAlgorithm} />
     </div>
   );
 }
